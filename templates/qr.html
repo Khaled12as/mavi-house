@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 style="color: var(--gold); text-align: center; margin-bottom: 2.5rem; font-family: 'Playfair Display', serif;">
+    QR Codes للطاولات (1 - 14)
+  </h1>
+
+  <div class="row g-4">
+    {% for qr in qr_codes %}
+      <div class="col-md-6 col-lg-4 col-xl-3">
+        <div class="card text-center h-100" style="background: #1a1a1a; border: 2px solid var(--gold);">
+          <div class="card-body">
+            <h4 class="text-warning mb-3">طاولة رقم {{ qr.table }}</h4>
+            
+            <div class="qr-container mb-4" style="background: #fff; padding: 15px; display: inline-block;">
+              <img src="data:image/png;base64,{{ qr.img_base64 }}" 
+                   alt="QR Table {{ qr.table }}" 
+                   style="width: 220px; height: 220px;">
+            </div>
+
+            <p class="small text-muted mb-3">{{ qr.url }}</p>
+
+            <a href="data:image/png;base64,{{ qr.img_base64 }}" 
+               download="طاولة_{{ qr.table }}.png" 
+               class="btn btn-gold w-100">
+              📥 تحميل صورة QR
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center mt-5">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light px-5 py-3">
+      ← العودة إلى لوحة الإدارة
+    </a>
+  </div>
+{% endblock %}

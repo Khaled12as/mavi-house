@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="text-center mb-5" style="color: var(--gold); font-family: 'Playfair Display', serif;">
+    سلة طلباتك - طاولة رقم {{ table }}
+  </h1>
+
+  {% if cart and cart|length > 0 %}
+    <div class="table-responsive mb-5">
+      <table class="table table-dark table-hover text-center align-middle">
+        <thead>
+          <tr>
+            <th class="text-start">الصنف</th>
+            <th>السعر الوحدة</th>
+            <th>الكمية</th>
+            <th>المجموع</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart %}
+          <tr>
+            <td class="text-start fw-bold">{{ item.name }}</td>
+            <td>{{ item.price|round(0)|int }} ل.س</td>
+            <td>
+              <div class="d-flex justify-content-center align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-light quantity-btn" 
+                        data-action="decrease" data-id="{{ item.id }}">-</button>
+                <span class="fs-5 fw-bold quantity-display">{{ item.quantity }}</span>
+                <button class="btn btn-sm btn-outline-light quantity-btn" 
+                        data-action="increase" data-id="{{ item.id }}">+</button>
+              </div>
+            </td>
+            <td class="fw-bold text-warning">{{ (item.price * item.quantity)|round(0)|int }} ل.س</td>
+            <td>
+              <button class="btn btn-sm btn-danger remove-item" data-id="{{ item.id }}">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="table-active fs-4">
+            <td colspan="3" class="text-end fw-bold">المجموع الكلي:</td>
+            <td colspan="2" class="text-warning fw-bold">
+              {{ total|round(0)|int }} ل.س
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="text-center">
+      <form method="POST" action="{{ url_for('submit_order') }}">
+        <button type="submit" class="btn-gold btn-lg px-5 py-3">
+          <i class="fas fa-paper-plane me-2"></i> إرسال الطلب إلى المطبخ
+        </button>
+      </form>
+    </div>
+
+  {% else %}
+    <div class="text-center py-5 my-5">
+      <i class="fas fa-shopping-cart fa-6x text-muted mb-4"></i>
+      <h3 class="text-muted">السلة فارغة</h3>
+      <p class="lead text-muted">لم تقم بإضافة أي أصناف بعد</p>
+      <a href="{{ url_for('menu', table=table) }}" class="btn-gold btn-lg px-5 mt-3">
+        العودة إلى المنيو
+      </a>
+    </div>
+  {% endif %}
+{% endblock %}

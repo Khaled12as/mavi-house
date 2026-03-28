@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-dashboard">
+  <!-- الهيدر الفاخر -->
+  <div class="dashboard-header">
+    <div>
+      <h1 style="color: var(--gold); font-family: 'Playfair Display', serif; font-size: 2.8rem; margin:0;">
+        Mavi House
+      </h1>
+      <p class="text-muted">مركز القيادة • السيطرة الكاملة</p>
+    </div>
+    <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">
+      <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+    </a>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-3">
+      <div class="stat-card gold-border">
+        <h5>الطلبات الحية</h5>
+        <h2 class="text-warning" id="live-orders-count">0</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <h5>قيد التحضير</h5>
+        <h2 class="text-info" id="preparing-count">0</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <h5>إجمالي المبيعات اليوم</h5>
+        <h2 class="text-success" id="daily-sales">0 ل.س</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <h5>متوسط وقت الانتظار</h5>
+        <h2 class="text-warning" id="avg-wait">12 دقيقة</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- خريطة الطاولات التفاعلية -->
+  <h4 class="mb-3 text-warning">خريطة الطاولات</h4>
+  <div id="floor-plan" class="floor-plan mb-5">
+    <!-- سيتم ملؤها بـ JavaScript -->
+  </div>
+
+  <!-- الطلبات الواردة -->
+  <h4 class="mb-3 text-warning">الطلبات الواردة (Live)</h4>
+  <div class="table-responsive">
+    <table class="table table-dark luxury-table" id="orders-table">
+      <thead>
+        <tr>
+          <th>الطاولة</th>
+          <th>الوقت</th>
+          <th>الطلب</th>
+          <th>المجموع</th>
+          <th>الحالة</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم تحديثها ديناميكيًا -->
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  // Socket.IO للتحديث الحي (Live Pulse)
+  const socket = io();
+
+  socket.on('new_order', function(data) {
+    // تنبيه صوتي فاخر
+    const audio = new Audio('https://freesound.org/data/previews/276/276952_5121238-lq.mp3');
+    audio.play();
+    
+    // إضافة الطلب الجديد في الأعلى
+    const tableBody = document.querySelector('#orders-table tbody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><strong>طاولة ${data.table}</strong></td>
+      <td>الآن</td>
+      <td>${data.items}</td>
+      <td class="text-warning">${data.total} ل.س</td>
+      <td><span class="badge bg-warning">جديد</span></td>
+      <td><button class="btn btn-sm btn-success">تم التجهيز</button></td>
+    `;
+    tableBody.prepend(row);
+  });
+</script>
+{% endblock %}

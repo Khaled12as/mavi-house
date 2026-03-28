@@ -1,0 +1,7 @@
+python
+from app import db, Category, Item
+db.create_all()   # لو ما عملتها قبل
+cat = Category.query.filter_by(name="القهوة الساخنة").first()
+item = Item(name="إسبريسو", price=15000, category_id=cat.id)
+db.session.add(item)
+db.session.commit()

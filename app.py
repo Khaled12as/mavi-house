@@ -35,7 +35,8 @@ class Order(db.Model):
     status = db.Column(db.String(20), default="new")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# الروابط الأساسية
+# ==================== الروابط ====================
+
 @app.route('/menu/<int:table>')
 def menu(table):
     session['table'] = table
@@ -54,7 +55,7 @@ def add_to_cart():
     data = request.get_json()
     cart = session.get('cart', [])
     for item in cart:
-        if item['id'] == int(data['id']):
+        if item.get('id') == int(data['id']):
             item['quantity'] = item.get('quantity', 1) + 1
             session['cart'] = cart
             return jsonify({"status": "success", "cart_count": len(cart)})
@@ -81,7 +82,11 @@ def submit_order():
         return jsonify({"error": "السلة فارغة"}), 400
     total = sum(item['price'] * item.get('quantity', 1) for item in cart)
     items_json = json.dumps(cart)
-    order = Order(table_number=session.get('table'), items_json=items_json, total=total)
+    order = Order(
+        table_number=session.get('table'),
+        items_json=items_json,
+        total=total
+    )
     db.session.add(order)
     db.session.commit()
     session.pop('cart', None)
@@ -96,7 +101,7 @@ def admin_dashboard():
     orders = Order.query.order_by(Order.created_at.desc()).all()
     return render_template('admin/dashboard.html', orders=orders)
 
-# تشغيل التطبيق
+# تشغيل التطبيق على Render
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
